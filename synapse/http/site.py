@@ -529,19 +529,19 @@ class XForwardedForRequest(SynapseRequest):
         if not headers:
             return
 
-        parsed = dict(map(str.strip, sub.split('=', 1))
-            for sub in headers[0].split(';') if '=' in sub)
+        parsed = dict(map(bytes.strip, sub.split(b'=', 1))
+            for sub in headers[0].split(b';') if b'=' in sub)
 
         # for now, we just use the first x-forwarded-for header. Really, we ought
         # to start from the client IP address, and check whether it is trusted; if it
         # is, work backwards through the headers until we find an untrusted address.
         # see https://github.com/matrix-org/synapse/issues/9471
         self._forwarded_for = _XForwardedForAddress(
-            parsed["for"].strip().decode("ascii")
+            parsed[b"for"].strip().decode("ascii")
         )
 
         # if we got an x-forwarded-for header, also look for an x-forwarded-proto header
-        header = parsed["proto"]
+        header = parsed[b"proto"]
         if header is not None:
             self._forwarded_https = header.lower() == b"https"
         else:
